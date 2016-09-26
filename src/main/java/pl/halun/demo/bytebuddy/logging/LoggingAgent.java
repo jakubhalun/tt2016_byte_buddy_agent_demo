@@ -13,9 +13,36 @@ import net.bytebuddy.matcher.ElementMatchers;
 import org.springframework.web.bind.annotation.RestController;
 
 public class LoggingAgent {
-	public static void premain(String agentArgument, Instrumentation inst) {
-		addLogToMethod(inst, RestController.class, "greeting");
-		addLogToMethod(inst, RestController.class, "showUserAgent");
+
+	/**
+	 * Allows installation of java agent from command line.
+	 *
+	 * @param agentArguments
+	 *            arguments for agent
+	 * @param instrumentation
+	 *            instrumentation instance
+	 */
+	public static void premain(String agentArguments,
+			Instrumentation instrumentation) {
+		addLogsToAnnotatedClass(instrumentation);
+	}
+
+	/**
+	 * Allows installation of java agent with Attach API.
+	 *
+	 * @param agentArguments
+	 *            arguments for agent
+	 * @param instrumentation
+	 *            instrumentation instance
+	 */
+	public static void agentmain(String agentArguments,
+			Instrumentation instrumentation) {
+		addLogsToAnnotatedClass(instrumentation);
+	}
+
+	private static void addLogsToAnnotatedClass(Instrumentation instrumentation) {
+		addLogToMethod(instrumentation, RestController.class, "greeting");
+		addLogToMethod(instrumentation, RestController.class, "showUserAgent");
 	}
 
 	private static void addLogToMethod(final Instrumentation instrumentation,
