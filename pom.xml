@@ -63,6 +63,7 @@
 					<archive>
 						<manifestEntries>
 							<Premain-Class>pl.halun.demo.bytebuddy.logging.LoggingAgent</Premain-Class>
+							<Agent-Class>pl.halun.demo.bytebuddy.logging.LoggingAgent</Agent-Class>
 						</manifestEntries>
 					</archive>
 				</configuration>

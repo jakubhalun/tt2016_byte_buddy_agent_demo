@@ -11,4 +11,4 @@ java -javaagent:byte-buddy-agent.jar -jar byte-buddy-agent-demo-instrumented-app
 
 ###Execution of agent with Attach API
 
-Check project [tt2016_attach_api_agent_loader](https://github.com/jakubhalun/tt2016_attach_api_agent_loader) to run agent with Attach API
+Check project [Attach API Agent Loader](https://github.com/jakubhalun/tt2016_attach_api_agent_loader) to load agent with Attach API
