@@ -3,6 +3,7 @@ package pl.halun.demo.bytebuddy.logging;
 import java.lang.annotation.Annotation;
 import java.lang.instrument.Instrumentation;
 
+import net.bytebuddy.agent.ByteBuddyAgent;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType;
@@ -24,7 +25,10 @@ public class LoggingAgent {
 	 */
 	public static void premain(String agentArguments,
 			Instrumentation instrumentation) {
-		addLogsToAnnotatedClass(instrumentation);
+		createAgent(RestController.class, "greeting")
+				.installOn(instrumentation);
+		createAgent(RestController.class, "showUserAgent").installOn(
+				instrumentation);
 	}
 
 	/**
@@ -37,20 +41,18 @@ public class LoggingAgent {
 	 */
 	public static void agentmain(String agentArguments,
 			Instrumentation instrumentation) {
-		addLogsToAnnotatedClass(instrumentation);
+		ByteBuddyAgent.install();
+
+		createAgent(RestController.class, "greeting").installOnByteBuddyAgent();
+		createAgent(RestController.class, "showUserAgent")
+				.installOnByteBuddyAgent();
 	}
 
-	private static void addLogsToAnnotatedClass(Instrumentation instrumentation) {
-		addLogToMethod(instrumentation, RestController.class, "greeting");
-		addLogToMethod(instrumentation, RestController.class, "showUserAgent");
-	}
-
-	private static void addLogToMethod(final Instrumentation instrumentation,
+	private static AgentBuilder createAgent(
 			Class<? extends Annotation> annotationType, String methodName) {
-
-		new AgentBuilder.Default()
-				.type(ElementMatchers.isAnnotatedWith(annotationType))
-				.transform(new AgentBuilder.Transformer() {
+		return new AgentBuilder.Default().type(
+				ElementMatchers.isAnnotatedWith(annotationType)).transform(
+				new AgentBuilder.Transformer() {
 					@Override
 					public DynamicType.Builder<?> transform(
 							DynamicType.Builder<?> builder,
@@ -64,7 +66,7 @@ public class LoggingAgent {
 												.andThen(
 														SuperMethodCall.INSTANCE));
 					}
-				}).installOn(instrumentation);
-
+				});
 	}
+
 }
