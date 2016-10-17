@@ -3,7 +3,6 @@ package pl.halun.demo.bytebuddy.logging;
 import java.lang.annotation.Annotation;
 import java.lang.instrument.Instrumentation;
 
-import net.bytebuddy.agent.ByteBuddyAgent;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType;
@@ -41,11 +40,10 @@ public class LoggingAgent {
 	 */
 	public static void agentmain(String agentArguments,
 			Instrumentation instrumentation) {
-		ByteBuddyAgent.install();
-
-		createAgent(RestController.class, "greeting").installOnByteBuddyAgent();
-		createAgent(RestController.class, "showUserAgent")
-				.installOnByteBuddyAgent();
+		createAgent(RestController.class, "greeting")
+				.installOn(instrumentation);
+		createAgent(RestController.class, "showUserAgent").installOn(
+				instrumentation);
 	}
 
 	private static AgentBuilder createAgent(
