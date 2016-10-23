@@ -24,10 +24,7 @@ public class LoggingAgent {
 	 */
 	public static void premain(String agentArguments,
 			Instrumentation instrumentation) {
-		createAgent(RestController.class, "greeting")
-				.installOn(instrumentation);
-		createAgent(RestController.class, "showUserAgent").installOn(
-				instrumentation);
+		install(instrumentation);
 	}
 
 	/**
@@ -40,6 +37,10 @@ public class LoggingAgent {
 	 */
 	public static void agentmain(String agentArguments,
 			Instrumentation instrumentation) {
+		install(instrumentation);
+	}
+
+	private static void install(Instrumentation instrumentation) {
 		createAgent(RestController.class, "greeting")
 				.installOn(instrumentation);
 		createAgent(RestController.class, "showUserAgent").installOn(
