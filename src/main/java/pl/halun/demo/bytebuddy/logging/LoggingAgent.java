@@ -1,9 +1,7 @@
 package pl.halun.demo.bytebuddy.logging;
 
-import static net.bytebuddy.matcher.ElementMatchers.isAnnotatedWith;
 import static net.bytebuddy.matcher.ElementMatchers.named;
 
-import java.lang.annotation.Annotation;
 import java.lang.instrument.Instrumentation;
 
 import net.bytebuddy.agent.builder.AgentBuilder;
@@ -11,9 +9,9 @@ import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType;
 
-import org.springframework.web.bind.annotation.RestController;
-
 public class LoggingAgent {
+
+	private static final String DEMO_INSTRUMENTED_CLASS_NAME = "pl.halun.demo.bytebuddy.instrumented.app.HelloController";
 
 	/**
 	 * Allows installation of java agent from command line.
@@ -25,7 +23,7 @@ public class LoggingAgent {
 	 */
 	public static void premain(String agentArguments,
 			Instrumentation instrumentation) {
-		install(instrumentation);
+		install(DEMO_INSTRUMENTED_CLASS_NAME, instrumentation);
 	}
 
 	/**
@@ -38,22 +36,20 @@ public class LoggingAgent {
 	 */
 	public static void agentmain(String agentArguments,
 			Instrumentation instrumentation) {
-		install(instrumentation);
+		install(DEMO_INSTRUMENTED_CLASS_NAME, instrumentation);
 	}
 
-	private static void install(Instrumentation instrumentation) {
-		createAgent(RestController.class, "greeting")
-				.installOn(instrumentation);
-		createAgent(RestController.class, "showUserAgent").installOn(
-				instrumentation);
+	private static void install(String className,
+			Instrumentation instrumentation) {
+		createAgent(className, "greeting").installOn(instrumentation);
+		createAgent(className, "showUserAgent").installOn(instrumentation);
 	}
 
-	private static AgentBuilder createAgent(
-			Class<? extends Annotation> annotationType, String methodName) {
+	private static AgentBuilder createAgent(String className, String methodName) {
 		return new AgentBuilder.Default().disableClassFormatChanges()
 				.disableBootstrapInjection()
 				.with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
-				.type(isAnnotatedWith(annotationType))
+				.type(named(className))
 				.transform(new AgentBuilder.Transformer() {
 					@Override
 					public DynamicType.Builder<?> transform(
