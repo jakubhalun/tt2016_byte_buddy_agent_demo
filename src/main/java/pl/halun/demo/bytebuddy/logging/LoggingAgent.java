@@ -1,14 +1,15 @@
 package pl.halun.demo.bytebuddy.logging;
 
+import static net.bytebuddy.matcher.ElementMatchers.isAnnotatedWith;
+import static net.bytebuddy.matcher.ElementMatchers.named;
+
 import java.lang.annotation.Annotation;
 import java.lang.instrument.Instrumentation;
 
 import net.bytebuddy.agent.builder.AgentBuilder;
+import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType;
-import net.bytebuddy.implementation.MethodDelegation;
-import net.bytebuddy.implementation.SuperMethodCall;
-import net.bytebuddy.matcher.ElementMatchers;
 
 import org.springframework.web.bind.annotation.RestController;
 
@@ -49,21 +50,18 @@ public class LoggingAgent {
 
 	private static AgentBuilder createAgent(
 			Class<? extends Annotation> annotationType, String methodName) {
-		return new AgentBuilder.Default().type(
-				ElementMatchers.isAnnotatedWith(annotationType)).transform(
-				new AgentBuilder.Transformer() {
+		return new AgentBuilder.Default().disableClassFormatChanges()
+				.disableBootstrapInjection()
+				.with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
+				.type(isAnnotatedWith(annotationType))
+				.transform(new AgentBuilder.Transformer() {
 					@Override
 					public DynamicType.Builder<?> transform(
 							DynamicType.Builder<?> builder,
 							TypeDescription typeDescription,
 							ClassLoader classLoader) {
-						return builder
-								.method(ElementMatchers.named(methodName))
-								.intercept(
-										MethodDelegation
-												.to(LoggingInterceptor.class)
-												.andThen(
-														SuperMethodCall.INSTANCE));
+						return builder.visit(Advice.to(LoggingAdvice.class).on(
+								named(methodName)));
 					}
 				});
 	}
