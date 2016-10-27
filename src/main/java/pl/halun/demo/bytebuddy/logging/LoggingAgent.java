@@ -47,7 +47,6 @@ public class LoggingAgent {
 
 	private static AgentBuilder createAgent(String className, String methodName) {
 		return new AgentBuilder.Default().disableClassFormatChanges()
-				.disableBootstrapInjection()
 				.with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
 				.type(named(className))
 				.transform(new AgentBuilder.Transformer() {
